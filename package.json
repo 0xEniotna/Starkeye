@@ -6,8 +6,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/react-d3-graph": "^2.6.3",
+    "d3": "^5.5.0",
     "next": "latest",
     "react": "18.2.0",
+    "react-d3-graph": "^2.6.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
