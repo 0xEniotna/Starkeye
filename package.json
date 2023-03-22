@@ -2,30 +2,53 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev-server": "node server.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src/ --ext .ts",
+    "lint:fix": "eslint src/ --ext .ts --fix"
   },
   "dependencies": {
+    "@apibara/protocol": "^0.4.3",
+    "@apibara/starknet": "^0.2.1",
+    "@apollo/client": "^3.7.10",
     "@types/react-d3-graph": "^2.6.3",
     "d3": "^5.5.0",
+    "decimal.js": "^10.4.3",
+    "dotenv": "^16.0.3",
+    "fs": "^0.0.1-security",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
+    "graphql-yoga": "^3.7.3",
+    "http-proxy-middleware": "^2.0.6",
     "next": "latest",
     "react": "18.2.0",
     "react-d3-graph": "^2.6.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-force-graph": "^1.42.0",
+    "react-force-graph-3d": "^1.22.0",
+    "react-loading": "^2.0.3",
+    "starknet": "^4.22.0",
+    "three": "^0.150.1",
+    "three-spritetext": "^1.8.0"
   },
   "devDependencies": {
     "@types/node": "18.11.3",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
+    "@types/three": "^0.149.0",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "autoprefixer": "^10.4.12",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "eslint-config-prettier": "^8.7.0",
+    "http2": "^3.3.7",
+    "net": "^1.0.2",
     "postcss": "^8.4.18",
     "prettier": "^2.8.4",
     "tailwindcss": "^3.2.4",
+    "tls": "^0.0.1",
     "typescript": "4.9.4"
   }
 }

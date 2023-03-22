@@ -1,421 +1,143 @@
-import { Graph } from "react-d3-graph";
-// import { config } from "./config";
-import { useEffect, useState, useRef, useCallback} from "react"
+import React, { useEffect, useState, useMemo} from "react"
+import dynamic from 'next/dynamic'
+import SpriteText from 'three-spritetext';
+import { mockData } from "../test_data/mockData";
+import { GraphData, buildGraphDataFromTransactions, Event } from "../utils/utils";
+import ReactLoading from 'react-loading';
+import { useQuery, gql } from '@apollo/client';
+import client from '../apolloClient';
 
 
-const mockData = {
-    links: [
-      // Groups
-      {
-        source: "Marvel",
-        target: "Heroes"
-      },
-      {
-        source: "Marvel",
-        target: "Villains"
-      },
-      {
-        source: "Marvel",
-        target: "Teams"
-      },
-      // Heroes
-      {
-        source: "Heroes",
-        target: "Spider-Man"
-      },
-      {
-        source: "Heroes",
-        target: "CAPTAIN MARVEL"
-      },
-      {
-        source: "Heroes",
-        target: "HULK"
-      },
-      {
-        source: "Heroes",
-        target: "Black Widow"
-      },
-      {
-        source: "Heroes",
-        target: "Daredevil"
-      },
-      {
-        source: "Heroes",
-        target: "Wolverine"
-      },
-      {
-        source: "Heroes",
-        target: "Captain America"
-      },
-      {
-        source: "Heroes",
-        target: "Iron Man"
-      },
-      {
-        source: "Heroes",
-        target: "THOR"
-      },
-      // Villains
-      {
-        source: "Villains",
-        target: "Dr. Doom"
-      },
-      {
-        source: "Villains",
-        target: "Mystique"
-      },
-      {
-        source: "Villains",
-        target: "Red Skull"
-      },
-      {
-        source: "Villains",
-        target: "Ronan"
-      },
-      {
-        source: "Villains",
-        target: "Magneto"
-      },
-      {
-        source: "Villains",
-        target: "Thanos"
-      },
-      {
-        source: "Villains",
-        target: "Black Cat"
-      },
-      // Teams
-      {
-        source: "Teams",
-        target: "Avengers"
-      },
-      {
-        source: "Teams",
-        target: "Guardians of the Galaxy"
-      },
-      {
-        source: "Teams",
-        target: "Defenders"
-      },
-      {
-        source: "Teams",
-        target: "X-Men"
-      },
-      {
-        source: "Teams",
-        target: "Fantastic Four"
-      },
-      {
-        source: "Teams",
-        target: "Inhumans"
-      }
-    ],
-    nodes: [
-      // Groups
-      {
-        id: "Marvel",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/marvel.png",
-        size: 500,
-        fontSize: 18
-      },
-      {
-        id: "Heroes",
-        symbolType: "circle",
-        color: "red",
-        size: 300
-      },
-      {
-        id: "Villains",
-        symbolType: "circle",
-        color: "red",
-        size: 300
-      },
-      {
-        id: "Teams",
-        symbolType: "circle",
-        color: "red",
-        size: 300
-      },
-      // Heroes
-      {
-        id: "Spider-Man",
-        name: "Peter Benjamin Parker",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_spiderman.png",
-        size: 400
-      },
-      {
-        id: "CAPTAIN MARVEL",
-        name: "Carol Danvers",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_captainmarvel.png",
-        size: 400
-      },
-      {
-        id: "HULK",
-        name: "Robert Bruce Banner",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_hulk.png",
-        size: 400
-      },
-      {
-        id: "Black Widow",
-        name: "Natasha Alianovna Romanova",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_blackwidow.png",
-        size: 400
-      },
-      {
-        id: "Daredevil",
-        name: "Matthew Michael Murdock",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_daredevil.png",
-        size: 400
-      },
-      {
-        id: "Wolverine",
-        name: "James Howlett",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_wolverine.png",
-        size: 400
-      },
-      {
-        id: "Captain America",
-        name: "Steven Rogers",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_captainamerica.png",
-        size: 400
-      },
-      {
-        id: "Iron Man",
-        name: "Tony Stark",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_ironman.png",
-        size: 400
-      },
-      {
-        id: "THOR",
-        name: "Thor Odinson",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/top_thor.png",
-        size: 400
-      },
-      // Villains
-      {
-        id: "Dr. Doom",
-        name: "Victor von Doom",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/drdoom.png",
-        size: 400
-      },
-      {
-        id: "Mystique",
-        name: "Unrevealed",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/mystique.png",
-        size: 400
-      },
-      {
-        id: "Red Skull",
-        name: "Johann Shmidt",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/redskull.png",
-        size: 400
-      },
-      {
-        id: "Ronan",
-        name: "Ronan",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/ronan.png",
-        size: 400
-      },
-      {
-        id: "Magneto",
-        name: "Max Eisenhardt",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/magneto.png",
-        size: 400
-      },
-      {
-        id: "Thanos",
-        name: "Thanos",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/thanos.png",
-        size: 400
-      },
-      {
-        id: "Black Cat",
-        name: "Felicia Hardy",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/blackcat.png",
-        size: 400
-      },
-      // Teams
-      {
-        id: "Avengers",
-        name: "",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/avengers.png",
-        size: 400
-      },
-      {
-        id: "Guardians of the Galaxy",
-        name: "",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/gofgalaxy.png",
-        size: 400
-      },
-      {
-        id: "Defenders",
-        name: "",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/defenders.png",
-        size: 400
-      },
-      {
-        id: "X-Men",
-        name: "",
-        svg: "http://marvel-force-chart.surge.sh/marvel_force_chart_img/xmen.png",
-        size: 400
-      },
-      {
-        id: "Fantastic Four",
-        name: "",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/fantasticfour.png",
-        size: 400
-      },
-      {
-        id: "Inhumans",
-        name: "",
-        svg:
-          "http://marvel-force-chart.surge.sh/marvel_force_chart_img/inhumans.png",
-        size: 400
-      }
-    ]
-};
+const GET_AGGREGATED_TRANSACTIONS_FROM = gql`
+  query AggregatedTransactionsFrom($address: String!) {
+    aggregatedtransactions(
+      where: { from: $address }
+      orderBy: value
+      first: 10
+    ) {
+      id
+      from
+      to
+      value
+    }
+  }
+`;
 
-type Node = {
-    id: String,
-    name: String,
-    svg: String,
-    size: number
+interface TransactionsGraphProps {
+  address: string,
+  graphData: GraphData;
+  setGraphData: React.Dispatch<React.SetStateAction<GraphData>>;
 }
 
-type Link = {
-    source: String,
-    target: String,
+export function TransactionsGraph({address, graphData, setGraphData }: TransactionsGraphProps) {
+  const DynamicGraph = dynamic(() => import('react-force-graph').then(mod => mod.ForceGraph3D), {
+    ssr: false
+  });
+  const { loading, error, data } = useQuery(GET_AGGREGATED_TRANSACTIONS_FROM, {
+    client,
+    variables: { address },
+  });
+
+  if (error) return <p>Error: {error.message}</p>;
+
+  // const graphData = useMemo(() => {
+  //   if (data) {
+  //     const { aggregatedtransactions } = data;
+  //     console.log("data", data);
+  //     return buildGraphDataFromTransactions(aggregatedtransactions, address);
+  //   }
+  //   return { nodes: [], links: [] };
+  // }, [data]);
+  useEffect(() => {
+    if (data) {
+      const { aggregatedtransactions } = data;
+      console.log("data", data);
+      setGraphData(buildGraphDataFromTransactions(aggregatedtransactions, address));
+    }
+  }, [data]);
+
+  return (
+    <>
+      {loading ? (
+              <ReactLoading className="" type="spin" color="#000" height={50} width={50} />
+            ) : (
+              // Render your graph or other components here
+                <DynamicGraph
+                  linkDirectionalParticles={2}
+                  graphData={graphData}
+                  nodeLabel="id"
+                  nodeAutoColorBy="group"
+                  onNodeDragEnd={node => {
+                      node.fx = node.x;
+                      node.fy = node.y;
+                      node.fz = node.z;
+                  }}
+                  nodeRelSize={3}
+                  nodeOpacity={0.8}
+                  nodeResolution={16}
+                  backgroundColor="white"
+                  linkWidth={1}
+                  linkAutoColorBy="group"
+                  linkCurvature={0}
+                  linkVisibility={true}
+                  linkDirectionalArrowLength={3.5}
+                  linkDirectionalArrowRelPos={1}
+                  linkLabel="value"
+                  nodeThreeObject={(node: any) => {
+                    const sprite = new SpriteText(node.id.substring(0, 12));
+                    sprite.color = 'black';
+                    sprite.textHeight = 1.5;
+                    return sprite;
+                  }}
+                  nodeThreeObjectExtend={true}                
+              /> 
+            )} 
+    </>
+  );
 }
 
-type Data = {
-    nodes: Array<Node>,
-    links: Array<Link>
-}
-
-function Main() {
-    const ref = useRef(null);
-
-    const [data, setData] = useState<Data>({
-        nodes: [],
-        links: []
-    });
-
-    const [updateKey, setUpdateKey] = useState(0);
+export default function Main () {
     
-    const [config, setConfig] = useState({});
+    const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });   
     
-    useEffect(() => {
-        const tmp = {
-            directed: true,
-            automaticRearrangeAfterDropNode: true,
-            collapsible: true,
-            height: window.innerHeight,
-            highlightDegree: 2,
-            highlightOpacity: 0.2,
-            linkHighlightBehavior: true,
-            maxZoom: 12,
-            minZoom: 0.05,
-            nodeHighlightBehavior: true, // comment this to reset nodes positions to work
-            panAndZoom: false,
-            staticGraph: false,
-            width: window.innerWidth,
-            d3: {
-                alphaTarget: 0.05,
-                gravity: -250,
-                linkLength: 120,
-                linkStrength: 2
-            },
-            node: {
-                color: "#d3d3d3",
-                fontColor: "black",
-                fontSize: 10,
-                fontWeight: "normal",
-                highlightColor: "red",
-                highlightFontSize: 14,
-                highlightFontWeight: "bold",
-                highlightStrokeColor: "red",
-                highlightStrokeWidth: 1.5,
-                labelProperty: (n: node) => (n.name ? `${n.id} - ${n.name}` : n.id),
-                mouseCursor: "crosshair",
-                opacity: 0.9,
-                renderLabel: true,
-                size: 200,
-                strokeColor: "none",
-                strokeWidth: 1.5,
-                svg: "",
-                symbolType: "circle",
-                viewGenerator: null
-            },
-            link: {
-                color: "lightgray",
-                highlightColor: "red",
-                mouseCursor: "pointer",
-                opacity: 1,
-                semanticStrokeWidth: true,
-                strokeWidth: 3,
-                type: "STRAIGHT"
-            }
-        };
-        setConfig(tmp);
-    });
-    
-    
-  
-    const resetNodesPositions = useCallback(() => {
-        if (ref.current) {
-        ref.current.resetNodesPositions();
-        }
-    }, [ref]);
-
-    const mockPromiseGetData = () => {
-        return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(mockData);
-        }, 1000);
-        });
+    const resetGraph = () => {
+        setGraphData(mockData);
     };
 
-    useEffect(() => {
-        async function initGraphData() {
-        const data = await mockPromiseGetData();
-        setData(data);
-        }
-        initGraphData();
-    }, []);
+    const [target, setTarget] = useState<string>('0x3ce2b9eaddadf58162eb6b43017955962305b39a8a4c45475ad2125ed08be1e');
 
-    useEffect(() => {
-        if (data.nodes.length) {
-        setUpdateKey((k) => ++k);
-        }
-    }, [data]);
-  
+    function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+      setTarget(event.target.value);
+    }
+    function handleSearchClick() {
+      // setAllEvents(events);
+      console.log("Clicked")
+    }
+    
     return (
-      <div key={updateKey}>
-        <button onClick={resetNodesPositions}>Reset Nodes</button>
-        <Graph id="test" data={data} config={config} ref={ref} />
-      </div>
+        <div className="">
+            <div className="z-40 bg-opacity-100 py-10 w-1/2 m-auto absolute top-0 left-0">
+                <h1 className="text-center font-bold text-4xl">{'STAR(s)KY'}</h1>
+                <div className="flex flex-col w-2/3 m-auto mt-8 relative">
+                    <input className="h-10 text-center border-b overflow-visible" placeholder="address"
+                      onChange={handleInputChange}>
+                    </input>
+                    <div className="flex flex-row pt-5 justify-evenly">
+                        <button className="h-10 rounded-xl bg-slate-400 py-3 px-5" onClick={handleSearchClick}>Search</button>
+                        <button className="h-10 rounded-xl bg-slate-400 py-3 px-5" onClick={resetGraph}>Reset Graph</button>
+                    </div>
+                </div>
+            </div>   
+            <div className="absolute top-0 right-0 m-4 z-40">
+                <a href="https://github.com/0xEniotna/Starky" target="_blank">
+                    <svg height="32" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true">
+                    <path fill="#000000" fillRule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.32c-2.23.48-2.7-1.07-2.7-1.07-.37-.95-.91-1.2-.91-1.2-.74-.5.06-.49.06-.49.82.06 1.25.85 1.25.85.73 1.25 1.91.9 2.37.69.07-.53.28-.9.51-1.1-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.58.82-2.14-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.14 0 3.07-1.87 3.75-3.65 3.95.29.25.54.74.54 1.5v2.22c0 .21.14.46.55.38A8.014 8.014 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                </a>
+            </div>
+            <div className="h-screen w-full flex items-center justify-center">
+              <TransactionsGraph address={target} graphData={graphData} setGraphData={setGraphData}/>
+            </div>
+        </div>            
     );
-  }
-
-export default Main
+}
