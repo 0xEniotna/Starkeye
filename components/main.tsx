@@ -39,8 +39,6 @@ export function TransactionsGraph({address, graphData, setGraphData }: Transacti
     variables: { address },
   });
 
-  if (error) return <p>Error: {error.message}</p>;
-
   useEffect(() => {
     if (data) {
       const { aggregatedtransactions } = data;
@@ -48,6 +46,8 @@ export function TransactionsGraph({address, graphData, setGraphData }: Transacti
       setGraphData(buildGraphDataFromTransactions(aggregatedtransactions, address));
     }
   }, [data, address, setGraphData]);
+  
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
