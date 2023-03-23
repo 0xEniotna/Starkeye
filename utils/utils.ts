@@ -60,11 +60,17 @@ export function buildGraphDataFromTransactions(
             nodeIds.add(transaction.to)
         }
 
-        links.push({
-            source: transaction.from,
-            target: transaction.to,
+        const source = transaction.from
+        const target = transaction.to
+
+        const link = {
+            source: transaction.value > 0 ? target : source,
+            target: transaction.value > 0 ? source : target,
             value: transaction.value,
-        })
+            // value: transaction.value,
+        }
+
+        links.push(link)
     })
 
     return { nodes, links }

@@ -5,12 +5,10 @@
     "dev-server": "node server.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src/ --ext .ts",
-    "lint:fix": "eslint src/ --ext .ts --fix"
+    "lint": "eslint ./ --ext .ts",
+    "lint:fix": "eslint ./ --ext .ts --fix"
   },
   "dependencies": {
-    "@apibara/protocol": "^0.4.3",
-    "@apibara/starknet": "^0.2.1",
     "@apollo/client": "^3.7.10",
     "@types/react-d3-graph": "^2.6.3",
     "d3": "^5.5.0",
@@ -19,11 +17,9 @@
     "fs": "^0.0.1-security",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
-    "graphql-yoga": "^3.7.3",
     "http-proxy-middleware": "^2.0.6",
     "next": "latest",
     "react": "18.2.0",
-    "react-d3-graph": "^2.6.0",
     "react-dom": "18.2.0",
     "react-force-graph": "^1.42.0",
     "react-force-graph-3d": "^1.22.0",

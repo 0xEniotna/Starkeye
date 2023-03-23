@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useMemo} from "react"
+import React, { useEffect, useState } from "react";
 import dynamic from 'next/dynamic'
 import SpriteText from 'three-spritetext';
-import { mockData } from "../test_data/mockData";
-import { GraphData, buildGraphDataFromTransactions, Event } from "../utils/utils";
+import { GraphData, buildGraphDataFromTransactions } from "../utils/utils";
 import ReactLoading from 'react-loading';
 import { useQuery, gql } from '@apollo/client';
 import client from '../apolloClient';
@@ -30,9 +29,11 @@ interface TransactionsGraphProps {
 }
 
 export function TransactionsGraph({address, graphData, setGraphData }: TransactionsGraphProps) {
-  const DynamicGraph = dynamic(() => import('react-force-graph').then(mod => mod.ForceGraph3D), {
-    ssr: false
-  });
+
+  const DynamicGraph = dynamic(
+    () => import("react-force-graph").then((mod) => mod.ForceGraph3D),
+    { ssr: false }
+  );
   const { loading, error, data } = useQuery(GET_AGGREGATED_TRANSACTIONS_FROM, {
     client,
     variables: { address },
@@ -40,21 +41,13 @@ export function TransactionsGraph({address, graphData, setGraphData }: Transacti
 
   if (error) return <p>Error: {error.message}</p>;
 
-  // const graphData = useMemo(() => {
-  //   if (data) {
-  //     const { aggregatedtransactions } = data;
-  //     console.log("data", data);
-  //     return buildGraphDataFromTransactions(aggregatedtransactions, address);
-  //   }
-  //   return { nodes: [], links: [] };
-  // }, [data]);
   useEffect(() => {
     if (data) {
       const { aggregatedtransactions } = data;
-      console.log("data", data);
+
       setGraphData(buildGraphDataFromTransactions(aggregatedtransactions, address));
     }
-  }, [data]);
+  }, [data, address, setGraphData]);
 
   return (
     <>
@@ -83,10 +76,30 @@ export function TransactionsGraph({address, graphData, setGraphData }: Transacti
                   linkDirectionalArrowLength={3.5}
                   linkDirectionalArrowRelPos={1}
                   linkLabel="value"
+                  linkThreeObjectExtend={true}
+                  linkThreeObject={(link : any) => {
+                    // extend link with text sprite
+                    const sprite = new SpriteText(`Ξ${link.value}`);
+                    sprite.color = 'grey';
+                    sprite.textHeight = 1.5;
+                    return sprite;
+                  }}
+                  linkPositionUpdate={(sprite, { start, end }) => {
+                    const middlePos = Object.assign(
+                      {},
+                      ...['x', 'y', 'z'].map(c => ({
+                        [c]: start[c] + (end[c] - start[c]) / 2, // calc middle point
+                      }))
+                    );
+                  
+                    // Position sprite
+                    Object.assign(sprite.position, middlePos);
+                  }}
                   nodeThreeObject={(node: any) => {
                     const sprite = new SpriteText(node.id.substring(0, 12));
                     sprite.color = 'black';
                     sprite.textHeight = 1.5;
+                    sprite.fontWeight= 'bold'
                     return sprite;
                   }}
                   nodeThreeObjectExtend={true}                
@@ -99,35 +112,52 @@ export function TransactionsGraph({address, graphData, setGraphData }: Transacti
 export default function Main () {
     
     const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });   
-    
+    const [target, setTarget] = useState<string>('0x3ce2b9eaddadf58162eb6b43017955962305b39a8a4c45475ad2125ed08be1e');
+    const [searchAddress, setSearchAddress] = useState<string>(target);
+
     const resetGraph = () => {
-        setGraphData(mockData);
+      handleSearchClick();
     };
 
-    const [target, setTarget] = useState<string>('0x3ce2b9eaddadf58162eb6b43017955962305b39a8a4c45475ad2125ed08be1e');
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
       setTarget(event.target.value);
     }
+  
     function handleSearchClick() {
-      // setAllEvents(events);
-      console.log("Clicked")
+      setSearchAddress(target);
     }
     
     return (
         <div className="">
-            <div className="z-40 bg-opacity-100 py-10 w-1/2 m-auto absolute top-0 left-0">
-                <h1 className="text-center font-bold text-4xl">{'STAR(s)KY'}</h1>
-                <div className="flex flex-col w-2/3 m-auto mt-8 relative">
-                    <input className="h-10 text-center border-b overflow-visible" placeholder="address"
-                      onChange={handleInputChange}>
-                    </input>
-                    <div className="flex flex-row pt-5 justify-evenly">
-                        <button className="h-10 rounded-xl bg-slate-400 py-3 px-5" onClick={handleSearchClick}>Search</button>
-                        <button className="h-10 rounded-xl bg-slate-400 py-3 px-5" onClick={resetGraph}>Reset Graph</button>
-                    </div>
+            <div className="z-40 bg-white bg-opacity-0 py-8 w-3/4 md:w-1/2 m-auto absolute top-0 left-0 transform mt-12 rounded-lg">
+              <h1 className="text-center font-bold text-4xl mb-4" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
+                <i className="fas fa-search"></i>
+                <span style={{ fontFamily: "'Roboto Mono', monospace" }}> StarkEye</span>
+              </h1>
+              <div className="flex flex-col items-center w-4/5 m-auto mt-4 relative">
+                <input
+                  className="h-12 text-center border-b-2 border-gray-300  w-full overflow-visible focus:outline-none focus:border-slate-400 transition-all"
+                  placeholder="address"
+                  onChange={handleInputChange}
+                ></input>
+                <div className="flex flex-row pt-5 justify-evenly w-full mt-4">
+                  <button
+                    className="h-12 rounded-xl bg-slate-400 hover:bg-slate-500 py-3 px-5 text-white transition-all focus:outline-none"
+                    onClick={handleSearchClick}
+                  >
+                    Search
+                  </button>
+                  <button
+                    className="h-12 rounded-xl bg-slate-400 hover:bg-slate-500 py-3 px-5 text-white transition-all focus:outline-none"
+                    onClick={resetGraph}
+                  >
+                    Reset Graph
+                  </button>
                 </div>
-            </div>   
+              </div>
+            </div>
+
             <div className="absolute top-0 right-0 m-4 z-40">
                 <a href="https://github.com/0xEniotna/Starky" target="_blank">
                     <svg height="32" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true">
@@ -136,7 +166,7 @@ export default function Main () {
                 </a>
             </div>
             <div className="h-screen w-full flex items-center justify-center">
-              <TransactionsGraph address={target} graphData={graphData} setGraphData={setGraphData}/>
+              <TransactionsGraph address={searchAddress} graphData={graphData} setGraphData={setGraphData}/>
             </div>
         </div>            
     );

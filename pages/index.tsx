@@ -8,6 +8,9 @@ const Home: NextPage = () => {
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
+        <script src="https://kit.fontawesome.com/c034175ff7.js" crossOrigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet"/>
+
       </Head>
 
       <Main />
