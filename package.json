@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
+    "@starknet-react/core": "^0.16.0",
     "@types/react-d3-graph": "^2.6.3",
     "d3": "^5.5.0",
     "decimal.js": "^10.4.3",

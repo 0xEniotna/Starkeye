@@ -40,23 +40,24 @@ export type AggregatedTx = {
 
 export function buildGraphDataFromTransactions(
     transactions: AggregatedTx[],
-    address: string
+    address: string,
+    provider: any
 ): GraphData {
     const nodes: any[] = []
     const links: LinkObject[] = []
 
     const nodeIds = new Set<string>()
-    nodes.push({ id: address, group: 1, color: 'red', size: 600 })
+    nodes.push({ id: address, group: 1, color: 'red' })
     nodeIds.add(address)
 
     transactions.forEach((transaction) => {
         if (!nodeIds.has(transaction.from)) {
-            nodes.push({ id: transaction.from, group: 1, size: 300 })
+            nodes.push({ id: transaction.from, group: 1 })
             nodeIds.add(transaction.from)
         }
 
         if (!nodeIds.has(transaction.to)) {
-            nodes.push({ id: transaction.to, group: 1, size: 300 })
+            nodes.push({ id: transaction.to, group: 1 })
             nodeIds.add(transaction.to)
         }
 
@@ -67,11 +68,18 @@ export function buildGraphDataFromTransactions(
             source: transaction.value > 0 ? target : source,
             target: transaction.value > 0 ? source : target,
             value: transaction.value,
-            // value: transaction.value,
         }
 
         links.push(link)
     })
-
+    nodes.forEach(async (element: any) => {
+        try {
+            await provider.getStarkName(element.id).then((res) => {
+                element.starknetId = res
+            })
+        } catch (error) {
+            element.starknetId = ''
+        }
+    })
     return { nodes, links }
 }
