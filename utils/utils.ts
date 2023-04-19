@@ -81,5 +81,14 @@ export function buildGraphDataFromTransactions(
             element.starknetId = ''
         }
     })
+
+    nodes.forEach(async (node: any) => {
+        try {
+            const starknetId = await provider.getStarkName(node.id)
+            node.starknetId = starknetId
+        } catch (error) {
+            node.starknetId = ''
+        }
+    })
     return { nodes, links }
 }
