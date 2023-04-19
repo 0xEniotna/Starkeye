@@ -24,6 +24,7 @@
     "react-dom": "18.2.0",
     "react-force-graph": "^1.42.0",
     "react-force-graph-3d": "^1.22.0",
+    "react-icons": "^4.8.0",
     "react-loading": "^2.0.3",
     "starknet": "^4.22.0",
     "three": "^0.150.1",
