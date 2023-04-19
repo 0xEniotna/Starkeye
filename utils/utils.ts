@@ -38,11 +38,11 @@ export type AggregatedTx = {
     value: number
 }
 
-export function buildGraphDataFromTransactions(
+export async function buildGraphDataFromTransactions(
     transactions: AggregatedTx[],
     address: string,
     provider: any
-): GraphData {
+): Promise<GraphData> {
     const nodes: any[] = []
     const links: LinkObject[] = []
 
@@ -82,13 +82,15 @@ export function buildGraphDataFromTransactions(
         }
     })
 
-    nodes.forEach(async (node: any) => {
-        try {
-            const starknetId = await provider.getStarkName(node.id)
-            node.starknetId = starknetId
-        } catch (error) {
-            node.starknetId = ''
-        }
-    })
+    await Promise.all(
+        nodes.map(async (node: any) => {
+            try {
+                const starknetId = await provider.getStarkName(node.id)
+                node.starknetId = starknetId
+            } catch (error) {
+                node.starknetId = ''
+            }
+        })
+    )
     return { nodes, links }
 }
