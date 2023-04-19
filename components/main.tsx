@@ -3,6 +3,11 @@ import { GraphData } from '../utils/utils'
 import { TransactionsGraph } from './graph'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
 
+const emptyGraphData: GraphData = {
+    nodes: [],
+    links: [],
+}
+
 export default function Main() {
     const [graphData, setGraphData] = useState<GraphData>({
         nodes: [],
@@ -14,8 +19,11 @@ export default function Main() {
     const [searchAddress, setSearchAddress] = useState<string>(
         '0x7c57808b9cea7130c44aab2f8ca6147b04408943b48c6d8c3c83eb8cfdd8c0b'
     )
+    const [resetToggle, setResetToggle] = useState(false)
 
     const resetGraph = () => {
+        setResetToggle(!resetToggle)
+
         handleSearchClick()
     }
 
@@ -85,6 +93,7 @@ export default function Main() {
                     address={searchAddress}
                     graphData={graphData}
                     setGraphData={setGraphData}
+                    resetToggle={resetToggle}
                 />
             </div>
         </div>

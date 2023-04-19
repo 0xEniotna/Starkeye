@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import SpriteText from 'three-spritetext'
 import { GraphData, buildGraphDataFromTransactions } from '../utils/utils'
@@ -26,21 +26,25 @@ interface TransactionsGraphProps {
     address: string
     graphData: GraphData
     setGraphData: React.Dispatch<React.SetStateAction<GraphData>>
+    resetToggle: boolean
 }
 
 export function TransactionsGraph({
     address,
     graphData,
     setGraphData,
+    resetToggle,
 }: TransactionsGraphProps) {
     const DynamicGraph = dynamic(
         () => import('react-force-graph').then((mod) => mod.ForceGraph3D),
         { ssr: false }
     )
+
     const [isMounted, setIsMounted] = useState(false)
     useEffect(() => {
         setIsMounted(true)
     }, [])
+
     const { loading, error, data } = useQuery(
         GET_AGGREGATED_TRANSACTIONS_FROM,
         {
@@ -72,11 +76,9 @@ export function TransactionsGraph({
 
             fetchGraphData()
         }
-    }, [data, address, setGraphData, provider])
+    }, [data, address, setGraphData, provider, resetToggle])
 
     if (error) return <p>Error: {error.message}</p>
-
-    console.log(graphData)
 
     return (
         <>
