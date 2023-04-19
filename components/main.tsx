@@ -3,11 +3,6 @@ import { GraphData } from '../utils/utils'
 import { TransactionsGraph } from './graph'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
 
-const emptyGraphData: GraphData = {
-    nodes: [],
-    links: [],
-}
-
 export default function Main() {
     const [graphData, setGraphData] = useState<GraphData>({
         nodes: [],
