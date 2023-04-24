@@ -3,6 +3,11 @@ import { GraphData } from '../utils/utils'
 import { TransactionsGraph } from './graph'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
 
+function isValidAddress(address: string): boolean {
+    const hexRegex = /^(0x)[0-9a-fA-F]+$/
+    return hexRegex.test(address)
+}
+
 export default function Main() {
     const [graphData, setGraphData] = useState<GraphData>({
         nodes: [],
@@ -27,7 +32,11 @@ export default function Main() {
     }
 
     function handleSearchClick() {
-        setSearchAddress(target)
+        if (isValidAddress(target.toLowerCase())) {
+            setSearchAddress(target)
+        } else {
+            alert('Invalid address format. Please enter a valid address.')
+        }
     }
 
     return (
