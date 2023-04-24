@@ -5,7 +5,16 @@ import { HiMagnifyingGlass } from 'react-icons/hi2'
 
 function isValidAddress(address: string): boolean {
     const hexRegex = /^(0x)[0-9a-fA-F]+$/
-    return hexRegex.test(address)
+
+    if (hexRegex.test(address)) {
+        // address is a valid Ethereum address
+        return true
+    } else if (address.endsWith('.stark')) {
+        // address is a valid Stark domain name
+        return true
+    } else {
+        return false
+    }
 }
 
 export default function Main() {
@@ -35,7 +44,9 @@ export default function Main() {
         if (isValidAddress(target.toLowerCase())) {
             setSearchAddress(target)
         } else {
-            alert('Invalid address format. Please enter a valid address.')
+            alert(
+                'Invalid address format. Please enter a valid address or Starkname.'
+            )
         }
     }
 
@@ -94,7 +105,7 @@ export default function Main() {
             </div>
             <div className="h-screen w-full flex items-center justify-center">
                 <TransactionsGraph
-                    address={searchAddress}
+                    addressOrName={searchAddress}
                     graphData={graphData}
                     setGraphData={setGraphData}
                     resetToggle={resetToggle}

@@ -24,14 +24,31 @@ const GET_AGGREGATED_TRANSACTIONS_FROM = gql`
 `
 
 interface TransactionsGraphProps {
-    address: string
+    addressOrName: string
     graphData: GraphData
     setGraphData: React.Dispatch<React.SetStateAction<GraphData>>
     resetToggle: boolean
 }
 
+async function getAddress(
+    addressOrName: string,
+    provider: any
+): Promise<string> {
+    if (addressOrName.endsWith('.stark')) {
+        // starkname was provided directly
+        const starkName = addressOrName.toLowerCase()
+
+        const address = await provider.getAddressFromStarkName(starkName)
+        return address.toLowerCase()
+    } else {
+        // A StarkName was provided, get its associated address
+
+        return addressOrName.toLowerCase()
+    }
+}
+
 export function TransactionsGraph({
-    address,
+    addressOrName,
     graphData,
     setGraphData,
     resetToggle,
@@ -44,10 +61,24 @@ export function TransactionsGraph({
     const [isMounted, setIsMounted] = useState(false)
     const [rawData, setRawData] = useState({})
     const [modalVisible, setModalVisible] = useState(false)
+    const [address, setAddress] = useState('')
+    const provider = useMemo(
+        () =>
+            new RpcProvider({
+                nodeUrl: `https://starknet-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
+            }),
+        []
+    )
 
     useEffect(() => {
         setIsMounted(true)
-    }, [])
+        const fetchAddr = async () => {
+            let addr = await getAddress(addressOrName, provider)
+            setAddress(addr)
+        }
+        fetchAddr()
+    }, [addressOrName, provider])
+
     const addressBigInt = BigInt(address.toLowerCase())
     const param = addressBigInt.toString(16)
     const formattedAddress = `0x${param}`
@@ -57,14 +88,6 @@ export function TransactionsGraph({
             client,
             variables: { param },
         }
-    )
-
-    const provider = useMemo(
-        () =>
-            new RpcProvider({
-                nodeUrl: `https://starknet-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
-            }),
-        []
     )
 
     useEffect(() => {
