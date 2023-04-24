@@ -36,6 +36,7 @@ export type AggregatedTx = {
     from: string
     to: string
     value: number
+    absVolume: number
 }
 
 export async function buildGraphDataFromTransactions(
@@ -61,13 +62,20 @@ export async function buildGraphDataFromTransactions(
             nodeIds.add(transaction.to)
         }
 
-        const source = transaction.from
-        const target = transaction.to
+        let from = transaction.from
+        let to = transaction.to
+        let source = transaction.value > 0 ? to : from
+        let target = transaction.value > 0 ? from : to
+        // Check if the input address is equal to the transaction.to and the value is negative
+        // if (address === to) {
+        //     source = transaction.value < 0 ? from : to
+        //     target = transaction.value < 0 ? to : from
+        // }
 
         const link = {
-            source: transaction.value > 0 ? target : source,
-            target: transaction.value > 0 ? source : target,
-            value: transaction.value,
+            source: source,
+            target: target,
+            value: transaction.absVolume,
         }
 
         links.push(link)
