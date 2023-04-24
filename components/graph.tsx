@@ -73,7 +73,7 @@ export function TransactionsGraph({
     useEffect(() => {
         setIsMounted(true)
         const fetchAddr = async () => {
-            let addr = await getAddress(addressOrName, provider)
+            const addr = await getAddress(addressOrName, provider)
             setAddress(addr)
         }
         fetchAddr()
