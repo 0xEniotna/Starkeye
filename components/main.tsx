@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { GraphData } from '../utils/utils'
 import { TransactionsGraph } from './graph'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
-import LeaderboardModal from './LeaderboardModal'
 
 export default function Main() {
     const [graphData, setGraphData] = useState<GraphData>({

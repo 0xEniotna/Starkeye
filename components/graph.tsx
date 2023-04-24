@@ -22,18 +22,6 @@ const GET_AGGREGATED_TRANSACTIONS_FROM = gql`
         }
     }
 `
-// mostNegative: aggregatedtransactions(
-//     where: { id_contains: $param }
-//     orderBy: value
-//     first: 20
-//     orderDirection: asc
-// ) {
-//     id
-//     from
-//     to
-//     value
-//     absVolume
-// }
 
 interface TransactionsGraphProps {
     address: string
@@ -55,6 +43,7 @@ export function TransactionsGraph({
 
     const [isMounted, setIsMounted] = useState(false)
     const [rawData, setRawData] = useState({})
+    const [modalVisible, setModalVisible] = useState(false)
 
     useEffect(() => {
         setIsMounted(true)
@@ -99,8 +88,9 @@ export function TransactionsGraph({
 
     if (error) return <p>Error: {error.message}</p>
 
-    const [modalVisible, setModalVisible] = useState(false)
-    const toggleModal = () => setModalVisible(!modalVisible)
+    const toggleModal = () => {
+        setModalVisible(!modalVisible)
+    }
 
     return (
         <>
