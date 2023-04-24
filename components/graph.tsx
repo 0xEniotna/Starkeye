@@ -96,13 +96,16 @@ export function TransactionsGraph({
         <>
             {isMounted &&
                 (loading ? (
-                    <ReactLoading
-                        className=""
-                        type="spin"
-                        color="#000"
-                        height={50}
-                        width={50}
-                    />
+                    <div className="flex flex-col items-center justify-center">
+                        <ReactLoading
+                            className=""
+                            type="spin"
+                            color="#000"
+                            height={50}
+                            width={50}
+                        />
+                        <p className="">Looking for transactions...</p>
+                    </div>
                 ) : (
                     // Render your graph or other components here
                     <div className="flex flex-col items-start">
